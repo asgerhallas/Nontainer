@@ -1,0 +1,62 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<UsingTask TaskName="Microsoft.Build.Tasks.XmlPoke" AssemblyName="Microsoft.Build.Tasks.v4.0, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"/>
+
+	<UsingTask TaskName="Now" TaskFactory="CodeTaskFactory"  AssemblyName="Microsoft.Build.Tasks.v4.0, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+		<ParameterGroup>
+			<Timestamp ParameterType="System.String" Output="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System"/>
+			<Code Type="Fragment" Language="cs">
+			<![CDATA[
+				Timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+			]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	
+	<UsingTask AssemblyFile="tools\xunit\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
+	
+	<PropertyGroup>
+		<OutputFolder>build</OutputFolder>
+		<ToolsFolder>tools</ToolsFolder>
+		<Nuget>$(ToolsFolder)\Nuget.exe</Nuget>
+		<MSBuildCommunityTasksLib>tools\</MSBuildCommunityTasksLib>
+	</PropertyGroup>
+	
+	<Target Name="Prepare">
+		<RemoveDir Directories="$(OutputFolder)" ContinueOnError="true"/>
+		<MakeDir Directories="$(OutputFolder)" ContinueOnError="true"/>
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="Prepare">
+		<MSBuild Projects="Nontainer.sln" StopOnFirstFailure="true" Properties="Configuration=Release" />
+	</Target>
+
+  <Target Name="CreatePackages" DependsOnTargets="Build">
+		<Now><Output TaskParameter="Timestamp" PropertyName="Timestamp" /></Now>
+    <ItemGroup>
+      <NuSpecs Include=".\**\*.nuspec"/>
+    </ItemGroup>
+    <MakeDir Directories="$(OutputFolder)"/>
+		
+		<XmlPoke XmlInputPath="%(NuSpecs.FullPath)" Query="//version" Value="1.0.0-pre$(Timestamp)" />
+    <Exec Command="$(Nuget) pack %(NuSpecs.FullPath) -OutputDirectory $(OutputFolder)"/>
+		<XmlPoke XmlInputPath="%(NuSpecs.FullPath)" Query="//version" Value="VERSION" />
+  </Target>
+
+  <Target Name="PublishPackages" DependsOnTargets="CreatePackages">
+    <ItemGroup>
+      <GeneratedPackages Include="$(OutputFolder)/*.nupkg"/>
+    </ItemGroup>
+
+		<Exec Command="$(NuGet) push %(GeneratedPackages.FullPath)"/>
+  </Target>
+
+	<Target Name="Deploy" DependsOnTargets="Build;CreatePackages">
+		<XmlPoke XmlInputPath="Nontainer\Nontainer.nuspec" Query="//version" Value="%(AssemblyIdentity.Version)-pre$(Timestamp)" />
+		<Exec Command="$(NuGet) push Nontainer\Nontainer.%(AssemblyIdentity.Version)-pre$(Timestamp).nupkg"/>
+		<XmlPoke XmlInputPath="Nontainer\Nontainer.nuspec" Query="//version" Value="" />
+	</Target>	
+	
+</Project>

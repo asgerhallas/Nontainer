@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Nontainer</id>
+    <version>VERSION</version>
+    <authors>Asger Hallas</authors>
+    <owners>Asger Hallas</owners>
+    <licenseUrl>http://github.com/asgerhallas/Nontainer</licenseUrl>
+    <projectUrl>http://github.com/asgerhallas/Nontainer</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A few helpers for a poor man's composition root</description>
+    <releaseNotes>
+    </releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>
+    </tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Nontainer.dll" target="lib\net45" />
+    <file src="bin\Release\Nontainer.pdb" target="lib\net45" />
+  </files>
+</package>

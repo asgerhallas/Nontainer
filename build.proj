@@ -28,8 +28,6 @@
       <AssemblyFileVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '^(\d+\.\d+\.\d+)(\-.+)?$', '$1'))</AssemblyFileVersion>
     </PropertyGroup>
 
-    <Message Text="$(AssemblyVersion)" />
-
     <FileReplace 
       Files="@(AssemblyInfos)" 
       Match='AssemblyVersion\(".+"\);AssemblyFileVersion\(".+"\);AssemblyInformationalVersion\(".+"\)'

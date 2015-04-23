@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Nontainer.SignalR</id>
-    <version>VERSION</version>
+    <version>$version$</version>
     <authors>Asger Hallas</authors>
     <owners>Asger Hallas</owners>
     <licenseUrl>http://github.com/asgerhallas/Nontainer</licenseUrl>
